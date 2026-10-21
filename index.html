@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Web Mini Games Hub — Sign In</title>
+
+<!-- Google Font: Poppins -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to main content</a>
+
+  <!-- Ambient animated background -->
+  <div class="bg-scene" aria-hidden="true">
+    <div class="grid-floor"></div>
+    <span class="orb orb-cyan"></span>
+    <span class="orb orb-magenta"></span>
+    <span class="orb orb-violet"></span>
+
+    <!-- Floating game glyphs (signature motif) -->
+    <div class="glyph glyph-1">🎲</div>
+    <div class="glyph glyph-2">🕹️</div>
+    <div class="glyph glyph-3">♠</div>
+    <div class="glyph glyph-4">🧩</div>
+    <div class="glyph glyph-5">✂️</div>
+    <div class="glyph glyph-6">⭕</div>
+  </div>
+
+  <main id="main-content" class="stage">
+
+    <!-- Brand -->
+    <div class="brand">
+      <div class="brand-mark">
+        <span class="brand-ring"></span>
+        <span class="brand-glyph">WM</span>
+      </div>
+      <h1 class="brand-name">Web Mini Games Hub</h1>
+      <p class="brand-tag">Play. Compete. Collect coins.</p>
+    </div>
+
+    <!-- Auth card -->
+    <section class="auth-card" id="authCard">
+
+      <!-- Tabs -->
+      <div class="tabs" role="tablist" aria-label="Authentication mode">
+        <button class="tab active" id="tabLogin" role="tab" aria-selected="true">Log In</button>
+        <button class="tab" id="tabSignup" role="tab" aria-selected="false">Sign Up</button>
+        <span class="tab-indicator" id="tabIndicator"></span>
+      </div>
+
+      <!-- Status / error banner -->
+      <div class="banner" id="banner" role="alert"></div>
+
+      <!-- LOGIN FORM -->
+      <form class="auth-form active" id="loginForm" novalidate>
+        <label class="field">
+          <span class="field-label">Email</span>
+          <input type="email" id="loginEmail" placeholder="you@example.com" autocomplete="email" required />
+        </label>
+
+        <label class="field">
+          <span class="field-label">Password</span>
+          <div class="pw-wrap">
+            <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password" required />
+            <button type="button" class="pw-toggle" data-target="loginPassword" aria-label="Show password">👁</button>
+          </div>
+        </label>
+
+        <button type="submit" class="btn btn-primary" id="loginSubmit">
+          <span class="btn-label">Log In</span>
+          <span class="spinner" hidden></span>
+        </button>
+      </form>
+
+      <!-- SIGNUP FORM -->
+      <form class="auth-form" id="signupForm" novalidate>
+        <label class="field">
+          <span class="field-label">Display name</span>
+          <input type="text" id="signupName" placeholder="Your player name" autocomplete="nickname" required minlength="2" maxlength="20" />
+        </label>
+
+        <label class="field">
+          <span class="field-label">Email</span>
+          <input type="email" id="signupEmail" placeholder="you@example.com" autocomplete="email" required />
+        </label>
+
+        <label class="field">
+          <span class="field-label">Password</span>
+          <div class="pw-wrap">
+            <input type="password" id="signupPassword" placeholder="At least 6 characters" autocomplete="new-password" required minlength="6" />
+            <button type="button" class="pw-toggle" data-target="signupPassword" aria-label="Show password">👁</button>
+          </div>
+        </label>
+
+        <div class="pw-strength" id="pwStrength">
+          <span></span><span></span><span></span>
+        </div>
+
+        <label class="field">
+          <span class="field-label">Confirm password</span>
+          <div class="pw-wrap">
+            <input type="password" id="signupConfirm" placeholder="Re-enter password" autocomplete="new-password" required />
+            <button type="button" class="pw-toggle" data-target="signupConfirm" aria-label="Show password">👁</button>
+          </div>
+        </label>
+
+        <label class="checkbox terms">
+          <input type="checkbox" id="agreeTerms" required />
+          <span>I agree to the Terms and Privacy Policy</span>
+        </label>
+
+        <button type="submit" class="btn btn-primary" id="signupSubmit">
+          <span class="btn-label">Create Account</span>
+          <span class="spinner" hidden></span>
+        </button>
+      </form>
+
+      <button type="button" class="btn btn-guest" id="guestBtn">
+        <span class="guest-icon">🎮</span>
+        <span>Continue as Guest</span>
+      </button>
+
+    </section>
+
+    <p class="footnote">By continuing you agree to play fair and have fun.</p>
+  </main>
+
+  <!-- Firebase v10 modular SDK is imported directly inside auth.js / auth-service.js / firebase-init.js -->
+  <script type="module" src="js/auth.js"></script>
+</body>
+</html>

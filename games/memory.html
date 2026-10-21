@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Memory Match — Web Mini Games Hub</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+<link rel="stylesheet" href="../css/memory.css" />
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to main content</a>
+
+  <div class="bg-scene" aria-hidden="true">
+    <span class="orb orb-cyan"></span>
+    <span class="orb orb-magenta"></span>
+    <span class="orb orb-violet"></span>
+  </div>
+
+  <!-- ============================= TOP BAR ============================= -->
+  <header class="topbar">
+    <button class="back-btn" id="backBtn" type="button">
+      <span class="back-arrow">←</span>
+      <span id="backBtnLabel">Back to Hub</span>
+    </button>
+    <h1 class="topbar-title" id="topbarTitle">🧠 Memory Match</h1>
+    <div class="topbar-actions">
+      <button class="icon-btn" id="soundToggleBtn" type="button" aria-label="Mute sound" aria-pressed="false">🔊</button>
+      <div class="coin-pill" id="coinPill">
+        <span class="coin-icon">🪙</span>
+        <span class="coin-amount" id="coinAmount">—</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Purchase / feedback banner -->
+  <p class="page-banner" id="pageBanner"></p>
+
+  <!-- ============================= MAIN ============================= -->
+  <main id="main-content" class="game-page">
+
+    <!-- ============================================================
+         SCREEN 1 — SETUP (grid size + Classic / Shuffle mode)
+    ============================================================= -->
+    <section class="screen setup-screen active" id="setupScreen">
+      <div class="screen-title-row">
+        <h2 class="screen-title">Memory Match</h2>
+        <button class="icon-btn help-btn" id="memoryHelpBtn" type="button" aria-label="How to play Memory Match">❓</button>
+      </div>
+      <p class="screen-subtitle">Flip cards, find every pair, beat the clock</p>
+
+      <section class="controls-panel">
+        <div class="control-group">
+          <span class="control-label">Grid Size</span>
+          <div class="segmented" id="gridSegmented" role="tablist">
+            <button class="segment active" data-grid="4" role="tab" aria-selected="true">4 × 4</button>
+            <button class="segment" data-grid="5" role="tab" aria-selected="false">5 × 5</button>
+          </div>
+        </div>
+      </section>
+
+      <div class="mode-cards">
+        <button class="mode-card" id="chooseClassicBtn" type="button">
+          <span class="mode-card-icon">🧠</span>
+          <span class="mode-card-title">Classic Mode</span>
+          <span class="mode-card-desc">Flip two cards at a time and clear the board at your own pace.</span>
+        </button>
+        <button class="mode-card" id="chooseShuffleBtn" type="button">
+          <span class="mode-card-icon">🔀</span>
+          <span class="mode-card-title">Shuffle Mode</span>
+          <span class="mode-card-desc">Every 10 seconds, unmatched cards swap places. Stay sharp!</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         SCREEN 2 — GAME
+    ============================================================= -->
+    <section class="screen game-screen" id="gameScreen">
+
+      <div class="screen-header">
+        <h2 class="screen-header-title" id="gameTitle">🧠 Classic Mode — 4×4</h2>
+      </div>
+
+      <!-- Timer + Score -->
+      <section class="stats-row">
+        <div class="stat-box">
+          <span class="stat-label">⏱ Time</span>
+          <span class="stat-value" id="timerValue">00:00</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-label">⭐ Score</span>
+          <span class="stat-value" id="scoreValue">0</span>
+        </div>
+        <div class="stat-box combo-box" id="comboBox" hidden>
+          <span class="stat-label">🔥 Combo</span>
+          <span class="stat-value" id="comboValue">x1.00</span>
+        </div>
+      </section>
+
+      <!-- Board -->
+      <div class="memory-board-wrap" id="memoryBoardWrap">
+        <div class="memory-board grid-4" id="memoryBoard">
+          <!-- cards injected by memory-game.js -->
+        </div>
+        <div class="shuffle-toast" id="shuffleToast">🔀 Cards Shuffled!</div>
+      </div>
+
+      <!-- Controls -->
+      <div class="game-controls">
+        <button class="btn btn-primary" id="memoryRestartBtn" type="button">🔄 Restart</button>
+        <button class="btn btn-secondary" id="memoryRevealBtn" type="button">👁️ Reveal for 3s (50 🪙)</button>
+      </div>
+
+      <!-- Completion overlay -->
+      <div class="completion-overlay" id="completionOverlay" hidden>
+        <div class="completion-card">
+          <span class="completion-icon">🏆</span>
+          <h3 class="completion-title">Board Cleared!</h3>
+          <div class="completion-stats">
+            <div class="completion-stat">
+              <span class="completion-label">Time</span>
+              <span class="completion-value" id="completionTime">00:00</span>
+            </div>
+            <div class="completion-stat">
+              <span class="completion-label">Score</span>
+              <span class="completion-value" id="completionScore">0</span>
+            </div>
+            <div class="completion-stat">
+              <span class="completion-label">Coins Earned</span>
+              <span class="completion-value" id="completionCoins">+0 🪙</span>
+            </div>
+          </div>
+          <div class="completion-actions">
+            <button class="btn btn-primary" id="playAgainBtn" type="button">🔄 Play Again</button>
+            <button class="btn btn-secondary" id="changeSetupFromCompletionBtn" type="button">← Change Setup</button>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ============================================================
+         HOW TO PLAY MODAL (opened via the ❓ Help button)
+    ============================================================= -->
+    <div class="modal-overlay" id="memoryHelpModalOverlay" hidden>
+      <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="memoryHelpModalTitle">
+        <div class="modal-header">
+          <h3 class="modal-title" id="memoryHelpModalTitle">❓ How to Play – Memory Card</h3>
+          <button class="modal-close-btn" id="memoryHelpModalCloseBtn" type="button" aria-label="Close rules">✕</button>
+        </div>
+        <div class="modal-body">
+          <ul class="help-list">
+            <li>Click a card to reveal it.</li>
+            <li>Find two matching cards.</li>
+            <li>Matching cards stay revealed.</li>
+            <li>Match all pairs to win.</li>
+            <li>Complete the game before the timer ends.</li>
+          </ul>
+
+          <p class="help-section-title">Modes</p>
+          <ul class="help-list">
+            <li><strong>4×4:</strong> Smaller board, fewer pairs.</li>
+            <li><strong>5×5:</strong> Larger board, more challenging.</li>
+          </ul>
+
+          <p class="help-section-title">Reveal</p>
+          <ul class="help-list">
+            <li>Reveals all cards for 3 seconds.</li>
+            <li>Costs 50 🪙.</li>
+          </ul>
+
+          <p class="help-section-title">Shuffle Mode</p>
+          <ul class="help-list">
+            <li>Cards shuffle periodically.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <script type="module" src="../js/memory.js"></script>
+</body>
+</html>

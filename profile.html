@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Web Mini Games Hub — My Profile</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+<link rel="stylesheet" href="css/profile.css" />
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to main content</a>
+
+  <div class="bg-scene" aria-hidden="true">
+    <span class="orb orb-cyan"></span>
+    <span class="orb orb-magenta"></span>
+    <span class="orb orb-violet"></span>
+  </div>
+
+  <!-- ============================= TOP BAR ============================= -->
+  <header class="topbar">
+    <button class="back-btn" id="backBtn" type="button">
+      <span class="back-arrow">←</span>
+      <span>Back to Hub</span>
+    </button>
+
+    <div class="topbar-right">
+      <button class="icon-btn" id="settingsBtn" aria-label="Settings" type="button">⚙️</button>
+      <div class="coin-pill" id="coinPill">
+        <span class="coin-icon">🪙</span>
+        <span class="coin-amount" id="coinAmount">—</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============================= MAIN ============================= -->
+  <main id="main-content" class="profile-page">
+
+    <!-- Status banner for avatar purchase / username save feedback -->
+    <div class="page-banner" id="pageBanner" role="alert"></div>
+
+    <!-- Hero: avatar, name, email, meta -->
+    <section class="profile-hero">
+      <div class="hero-glow" aria-hidden="true"></div>
+
+      <div class="hero-avatar-wrap">
+        <div class="hero-avatar" id="heroAvatar">?</div>
+        <span class="guest-tag" id="guestTag" hidden>Guest</span>
+      </div>
+
+      <div class="hero-info">
+        <div class="name-row">
+          <h1 class="display-name" id="displayNameText">Loading…</h1>
+          <button class="edit-name-btn" id="editNameBtn" type="button" aria-label="Edit username">✏️</button>
+        </div>
+
+        <form class="name-edit-form" id="nameEditForm" hidden>
+          <input type="text" id="nameInput" maxlength="20" minlength="2" placeholder="New username" autocomplete="off" />
+          <button type="submit" class="name-save-btn" id="nameSaveBtn">Save</button>
+          <button type="button" class="name-cancel-btn" id="nameCancelBtn">Cancel</button>
+        </form>
+
+        <p class="email-text" id="emailText">—</p>
+        <p class="meta-text" id="memberSinceText">Member since —</p>
+      </div>
+    </section>
+
+    <!-- Two-column: Avatar picker + Account/Progress summary -->
+    <div class="profile-grid">
+
+      <!-- Avatar picker -->
+      <section class="panel" id="panelAvatars">
+        <div class="panel-header">
+          <h2>🎭 Choose Your Avatar</h2>
+          <span class="panel-tag" id="avatarUnlockedTag">0 / 0 unlocked</span>
+        </div>
+        <p class="panel-subtext">The first 5 are free — unlock the rest with coins you earn from playing.</p>
+        <div class="avatar-grid" id="avatarGrid"><!-- injected --></div>
+      </section>
+
+      <!-- Statistics -->
+      <section class="panel" id="panelStats">
+        <div class="panel-header">
+          <h2>📊 Statistics</h2>
+        </div>
+
+        <div class="stats-grid" id="statsGrid"><!-- injected --></div>
+
+        <div class="stats-bars" id="statsBars"><!-- injected --></div>
+      </section>
+
+    </div>
+
+    <!-- Achievements (full width) -->
+    <section class="panel" id="panelAchievements">
+      <div class="panel-header">
+        <h2>🏆 Achievements</h2>
+        <span class="panel-tag" id="achievementsCountTag">0 / 0</span>
+      </div>
+      <p class="panel-subtext guest-only-note" id="guestAchievementsNote" hidden>Create an account to save and track your progress.</p>
+      <div class="achievements-grid-full" id="achievementsGridFull"><!-- injected --></div>
+    </section>
+
+  </main>
+
+  <script type="module" src="js/profile.js"></script>
+</body>
+</html>

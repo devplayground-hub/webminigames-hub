@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Web Mini Games Hub — Settings</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+<link rel="stylesheet" href="css/settings.css" />
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to main content</a>
+
+  <div class="bg-scene" aria-hidden="true">
+    <span class="orb orb-cyan"></span>
+    <span class="orb orb-magenta"></span>
+    <span class="orb orb-violet"></span>
+  </div>
+
+  <!-- ============================= TOP BAR ============================= -->
+  <header class="topbar">
+    <button class="back-btn" id="backBtn" type="button">
+      <span class="back-arrow">←</span>
+      <span>Back to Hub</span>
+    </button>
+    <h1 class="topbar-title">Settings</h1>
+    <div class="coin-pill" id="coinPill">
+      <span class="coin-icon">🪙</span>
+      <span class="coin-amount" id="coinAmount">—</span>
+    </div>
+  </header>
+
+  <!-- ============================= MAIN ============================= -->
+  <main id="main-content" class="settings-page">
+
+    <div class="page-banner" id="pageBanner" role="alert"></div>
+
+    <!-- ============ APPEARANCE ============ -->
+    <section class="panel">
+      <div class="panel-header">
+        <h2>🎨 Appearance</h2>
+      </div>
+
+      <p class="group-label">UI Theme</p>
+      <div class="swatch-grid" id="themeGrid"><!-- injected --></div>
+
+      <p class="group-label">Background</p>
+      <div class="swatch-grid" id="backgroundGrid"><!-- injected --></div>
+    </section>
+
+    <!-- ============ AUDIO ============ -->
+    <section class="panel">
+      <div class="panel-header">
+        <h2>🔊 Audio</h2>
+      </div>
+
+      <div class="audio-row">
+        <div class="audio-row-top">
+          <span class="audio-label">Sound Effects</span>
+          <label class="switch">
+            <input type="checkbox" id="soundToggle" />
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="audio-row-bottom">
+          <input type="range" id="soundVolume" min="0" max="100" value="70" class="volume-slider" />
+          <button class="test-btn" id="testSoundBtn" type="button">Test</button>
+        </div>
+      </div>
+
+      <div class="audio-row">
+        <div class="audio-row-top">
+          <span class="audio-label">Music</span>
+          <label class="switch">
+            <input type="checkbox" id="musicToggle" />
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="audio-row-bottom">
+          <input type="range" id="musicVolume" min="0" max="100" value="50" class="volume-slider" />
+          <button class="test-btn" id="previewMusicBtn" type="button">Preview</button>
+        </div>
+      </div>
+
+      <p class="panel-footnote">No music or sound files are wired in yet — Test / Preview play a quick synthesized tone so you can confirm these controls work.</p>
+    </section>
+
+    <!-- ============ ACCOUNT ============ -->
+    <section class="panel">
+      <div class="panel-header">
+        <h2>👤 Account</h2>
+      </div>
+
+      <div class="account-info">
+        <div class="account-info-row">
+          <span class="info-label">Signed in as</span>
+          <span class="info-value" id="accountEmail">—</span>
+        </div>
+        <div class="account-info-row">
+          <span class="info-label">Account type</span>
+          <span class="info-value" id="accountType">—</span>
+        </div>
+        <div class="account-info-row">
+          <span class="info-label">Member since</span>
+          <span class="info-value" id="accountSince">—</span>
+        </div>
+      </div>
+
+      <!-- Guest upgrade (shown only for anonymous accounts) -->
+      <div class="account-block" id="guestUpgradeBlock" hidden>
+        <h3>Create a permanent account</h3>
+        <p class="panel-footnote">You're playing as a guest, so your coins and progress only last for this session. Add an email and password to create a permanent account — heads up, it starts fresh at 0 coins rather than carrying over your guest progress.</p>
+        <form class="upgrade-form" id="upgradeForm">
+          <input type="text" id="upgradeName" placeholder="Display name" autocomplete="nickname" required minlength="2" maxlength="20" />
+          <input type="email" id="upgradeEmail" placeholder="Email address" autocomplete="email" required />
+          <input type="password" id="upgradePassword" placeholder="Password (min 6 characters)" autocomplete="new-password" required minlength="6" />
+          <button type="submit" class="btn btn-primary" id="upgradeSubmit">
+            <span class="btn-label">Create Account</span>
+            <span class="spinner" hidden></span>
+          </button>
+        </form>
+      </div>
+
+      <!-- Password reset (shown only for registered accounts) -->
+      <div class="account-block" id="passwordResetBlock" hidden>
+        <h3>Password</h3>
+        <p class="panel-footnote">We'll email you a link to reset your password.</p>
+        <button class="btn btn-secondary" id="resetPasswordBtn" type="button">Send Password Reset Email</button>
+      </div>
+
+      <!-- Logout -->
+      <div class="account-block">
+        <h3>Session</h3>
+        <button class="btn btn-secondary" id="logoutBtn" type="button">🚪 Log Out</button>
+      </div>
+
+      <!-- Danger zone -->
+      <div class="account-block danger-zone">
+        <h3>Danger Zone</h3>
+        <p class="panel-footnote">Permanently delete your account and all progress. This can't be undone.</p>
+        <button class="btn btn-danger" id="deleteAccountBtn" type="button">Delete My Account</button>
+
+        <div class="confirm-box" id="deleteConfirmBox" hidden>
+          <p>Type <strong>DELETE</strong> to confirm. This removes your profile, coins, achievements, and stats forever.</p>
+          <input type="text" id="deleteConfirmInput" placeholder="Type DELETE" autocomplete="off" />
+          <div class="confirm-actions">
+            <button class="btn btn-danger" id="deleteConfirmBtn" type="button">Permanently Delete</button>
+            <button class="btn btn-secondary" id="deleteCancelBtn" type="button">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script type="module" src="js/settings.js"></script>
+</body>
+</html>

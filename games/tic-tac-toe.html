@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Tic Tac Toe — Web Mini Games Hub</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+<link rel="stylesheet" href="../css/tic-tac-toe.css" />
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to main content</a>
+
+  <div class="bg-scene" aria-hidden="true">
+    <span class="orb orb-cyan"></span>
+    <span class="orb orb-magenta"></span>
+    <span class="orb orb-violet"></span>
+  </div>
+
+  <!-- ============================= TOP BAR ============================= -->
+  <header class="topbar">
+    <button class="back-btn" id="backBtn" type="button">
+      <span class="back-arrow">←</span>
+      <span id="backBtnLabel">Back to Hub</span>
+    </button>
+    <h1 class="topbar-title" id="topbarTitle">⭕ Tic Tac Toe</h1>
+    <div class="topbar-actions">
+      <button class="icon-btn" id="soundToggleBtn" type="button" aria-label="Mute sound" aria-pressed="false">🔊</button>
+      <div class="coin-pill" id="coinPill">
+        <span class="coin-icon">🪙</span>
+        <span class="coin-amount" id="coinAmount">—</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Purchase / feedback banner -->
+  <p class="page-banner" id="pageBanner"></p>
+
+  <!-- ============================= MAIN ============================= -->
+  <main id="main-content" class="game-page">
+
+    <!-- ============================================================
+         SCREEN 1 — MODE SELECTION (variant + Player vs Player/Computer
+         + difficulty, all on one page — no separate setup page)
+    ============================================================= -->
+    <section class="screen mode-select-screen" id="modeSelectScreen">
+      <div class="screen-title-row">
+        <h2 class="screen-title">Choose Your Mode</h2>
+        <button class="icon-btn help-btn" id="tttHelpBtn" type="button" aria-label="How to play Tic Tac Toe">❓</button>
+      </div>
+      <p class="screen-subtitle">Pick how you want to play Tic Tac Toe</p>
+
+      <div class="mode-cards">
+        <button class="mode-card selected" id="chooseClassicBtn" type="button" data-variant="classic" aria-pressed="true">
+          <span class="mode-card-icon">⭕</span>
+          <span class="mode-card-title">Classic Mode</span>
+          <span class="mode-card-desc">The timeless 3×3 game. Player vs Player or vs Computer, plus a coin-locked Vanishing twist.</span>
+        </button>
+        <button class="mode-card" id="chooseUltimateBtn" type="button" data-variant="ultimate" aria-pressed="false">
+          <span class="mode-card-icon">🌌</span>
+          <span class="mode-card-title">Ultimate Mode</span>
+          <span class="mode-card-desc">Nine linked boards, one meta-game. Official Ultimate Tic Tac Toe rules.</span>
+        </button>
+      </div>
+
+      <!-- Player vs Player / Player vs Computer + difficulty, right here
+           on the mode-select page — applies to whichever card above is
+           currently selected. -->
+      <section class="controls-panel">
+        <div class="control-group">
+          <span class="control-label">Mode</span>
+          <div class="segmented" id="setupModeSegmented" role="tablist">
+            <button class="segment active" data-mode="pvp" role="tab" aria-selected="true">👥 Player vs Player</button>
+            <button class="segment" data-mode="pvc" role="tab" aria-selected="false">🤖 Player vs Computer</button>
+          </div>
+        </div>
+
+        <div class="control-group" id="setupDifficultyGroup" hidden>
+          <span class="control-label">Difficulty</span>
+          <div class="segmented" id="setupDifficultySegmented" role="tablist">
+            <button class="segment" data-difficulty="easy" role="tab" aria-selected="false">Easy</button>
+            <button class="segment active" data-difficulty="medium" role="tab" aria-selected="true">Medium</button>
+            <button class="segment" data-difficulty="hard" role="tab" aria-selected="false">Hard</button>
+          </div>
+        </div>
+      </section>
+
+      <div class="game-controls">
+        <button class="btn btn-primary btn-block" id="setupStartBtn" type="button">▶️ Start Game</button>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         SCREEN 2 — CLASSIC MODE
+    ============================================================= -->
+    <section class="screen classic-screen" id="classicScreen">
+
+      <div class="screen-header">
+        <h2 class="screen-header-title">⭕ Classic Mode</h2>
+      </div>
+
+      <!-- Vanishing Mode control (Mode + Difficulty now live on the setup screen) -->
+      <section class="controls-panel">
+        <div class="control-group vanishing-group">
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <span class="control-label">👻 Vanishing Mode</span>
+              <span class="toggle-desc">Moves disappear once 5 newer moves are played</span>
+            </div>
+            <button class="toggle-switch" id="vanishingToggle" type="button" role="switch" aria-checked="false" aria-label="Toggle Vanishing Mode"></button>
+          </div>
+          <div class="feature-lock-badge" id="vanishingLockBadge">
+            <span class="lock-icon">🔒</span>
+            <span id="vanishingCostLabel">Unlock for 40 🪙</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Scoreboard -->
+      <section class="scoreboard" id="classicScoreboard">
+        <div class="score-box score-x" id="classicScoreBoxX">
+          <span class="score-label" id="classicLabelX">Player X</span>
+          <span class="score-value" id="classicScoreX">0</span>
+        </div>
+        <div class="score-box score-draw">
+          <span class="score-label">Draws</span>
+          <span class="score-value" id="classicScoreDraws">0</span>
+        </div>
+        <div class="score-box score-o" id="classicScoreBoxO">
+          <span class="score-label" id="classicLabelO">Player O</span>
+          <span class="score-value" id="classicScoreO">0</span>
+        </div>
+      </section>
+
+      <!-- Status line -->
+      <p class="status-line" id="classicStatusLine">Player X's turn</p>
+
+      <!-- Board -->
+      <div class="board-wrap">
+        <div class="board" id="classicBoard">
+          <!-- 9 cells injected by ttt-classic.js -->
+          <div class="win-line" id="classicWinLine" hidden></div>
+        </div>
+      </div>
+
+      <!-- Controls -->
+      <div class="game-controls">
+        <button class="btn btn-primary" id="classicRestartBtn" type="button">🔄 New Round</button>
+        <button class="btn btn-secondary" id="classicResetScoreBtn" type="button">Reset Score</button>
+      </div>
+
+    </section>
+
+    <!-- ============================================================
+         SCREEN 3 — ULTIMATE MODE
+    ============================================================= -->
+    <section class="screen ultimate-screen" id="ultimateScreen">
+
+      <div class="screen-header">
+        <h2 class="screen-header-title">🌌 Ultimate Mode</h2>
+      </div>
+
+      <!-- Scoreboard -->
+      <section class="scoreboard" id="ultimateScoreboard">
+        <div class="score-box score-x" id="ultimateScoreBoxX">
+          <span class="score-label" id="ultimateLabelX">Player X</span>
+          <span class="score-value" id="ultimateScoreX">0</span>
+        </div>
+        <div class="score-box score-draw">
+          <span class="score-label">Draws</span>
+          <span class="score-value" id="ultimateScoreDraws">0</span>
+        </div>
+        <div class="score-box score-o" id="ultimateScoreBoxO">
+          <span class="score-label" id="ultimateLabelO">Player O</span>
+          <span class="score-value" id="ultimateScoreO">0</span>
+        </div>
+      </section>
+
+      <!-- Status line -->
+      <p class="status-line" id="ultimateStatusLine">Player X's turn</p>
+
+      <!-- Ultimate board: 3x3 grid of 3x3 mini-boards -->
+      <div class="ultimate-board-wrap" id="ultimateBoardWrap">
+        <div class="ultimate-board" id="ultimateBoard">
+          <!-- 9 mini-boards (each with 9 cells) injected by ttt-ultimate.js -->
+          <div class="win-line ultimate-win-line" id="ultimateWinLine" hidden></div>
+        </div>
+      </div>
+
+      <!-- Controls -->
+      <div class="game-controls">
+        <button class="btn btn-primary" id="ultimateRestartBtn" type="button">🔄 New Round</button>
+        <button class="btn btn-secondary" id="ultimateResetScoreBtn" type="button">Reset Score</button>
+      </div>
+
+    </section>
+
+    <!-- ============================================================
+         HOW TO PLAY MODAL (opened via the ❓ Help button)
+    ============================================================= -->
+    <div class="modal-overlay" id="tttHelpModalOverlay" hidden>
+      <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="tttHelpModalTitle">
+        <div class="modal-header">
+          <h3 class="modal-title" id="tttHelpModalTitle">❓ How to Play – Tic-Tac-Toe</h3>
+          <button class="modal-close-btn" id="tttHelpModalCloseBtn" type="button" aria-label="Close rules">✕</button>
+        </div>
+        <div class="modal-body">
+          <p class="help-section-title">Classic</p>
+          <ul class="help-list">
+            <li>Play on a 3×3 grid.</li>
+            <li>Take turns placing X or O.</li>
+            <li>Get 3 in a row, column, or diagonal to win.</li>
+            <li>Full board, no winner = Draw.</li>
+            <li>In PvComputer, you play against the computer.</li>
+            <li>No move for 10 seconds → a random cell is picked.</li>
+          </ul>
+
+          <p class="help-section-title">Vanishing</p>
+          <ul class="help-list">
+            <li>Your moves disappear after 5 turns.</li>
+            <li>Plan your moves carefully.</li>
+            <li>Costs 40 🪙 to unlock.</li>
+          </ul>
+
+          <p class="help-section-title">Ultimate</p>
+          <ul class="help-list">
+            <li>Play on 9 small 3×3 boards.</li>
+            <li>Your move decides where your opponent plays next.</li>
+            <li>Win 3 small boards in a row, column, or diagonal to win.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <script type="module" src="../js/tic-tac-toe.js"></script>
+</body>
+</html>

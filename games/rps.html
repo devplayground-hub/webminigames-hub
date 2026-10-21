@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Rock Paper Scissors — Web Mini Games Hub</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+<link rel="stylesheet" href="../css/rps.css" />
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to main content</a>
+
+  <div class="bg-scene" aria-hidden="true">
+    <span class="orb orb-cyan"></span>
+    <span class="orb orb-magenta"></span>
+    <span class="orb orb-violet"></span>
+  </div>
+
+  <!-- ============================= TOP BAR ============================= -->
+  <header class="topbar">
+    <button class="back-btn" id="backBtn" type="button">
+      <span class="back-arrow">←</span>
+      <span id="backBtnLabel">Back to Hub</span>
+    </button>
+    <h1 class="topbar-title" id="topbarTitle">✊ Rock Paper Scissors</h1>
+    <div class="topbar-actions">
+      <button class="icon-btn" id="soundToggleBtn" type="button" aria-label="Mute sound" aria-pressed="false">🔊</button>
+      <div class="coin-pill" id="coinPill">
+        <span class="coin-icon">🪙</span>
+        <span class="coin-amount" id="coinAmount">—</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Feedback banner -->
+  <p class="page-banner" id="pageBanner"></p>
+
+  <!-- ============================= MAIN ============================= -->
+  <main id="main-content" class="game-page">
+
+    <!-- ============================================================
+         SCREEN 1 — MODE SELECT
+    ============================================================= -->
+    <section class="screen mode-screen active" id="modeScreen">
+      <div class="screen-title-row">
+        <h2 class="screen-title">Rock Paper Scissors</h2>
+        <button class="icon-btn help-btn" id="rpsHelpBtn" type="button" aria-label="How to play Rock Paper Scissors">❓</button>
+      </div>
+
+      <div class="mode-grid">
+        <button class="mode-card" id="classicModeCard" type="button" data-mode="classic">
+          <span class="mode-card-icon">✊</span>
+          <h3 class="mode-card-title">Classic Mode</h3>
+          <p class="mode-card-desc">The original three-move showdown. Quick rounds, pure instinct.</p>
+          <div class="mode-card-moves">
+            <span class="mode-chip">Rock</span>
+            <span class="mode-chip">Paper</span>
+            <span class="mode-chip">Scissors</span>
+          </div>
+        </button>
+
+        <button class="mode-card" id="extendedModeCard" type="button" data-mode="extended">
+          <span class="mode-card-icon">🖖</span>
+          <h3 class="mode-card-title">Extended Mode</h3>
+          <p class="mode-card-desc">Seven moves, twenty-one match-ups. Every move beats exactly three others.</p>
+          <div class="mode-card-moves">
+            <span class="mode-chip">Rock</span>
+            <span class="mode-chip">Paper</span>
+            <span class="mode-chip">Scissors</span>
+            <span class="mode-chip">Lizard</span>
+            <span class="mode-chip">Spock</span>
+            <span class="mode-chip">Fire</span>
+            <span class="mode-chip">Water</span>
+          </div>
+        </button>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         SCREEN 2 — GAME
+    ============================================================= -->
+    <section class="screen game-screen" id="gameScreen">
+
+      <div class="screen-header">
+        <h2 class="screen-header-title" id="gameTitle">✊ Classic Mode</h2>
+      </div>
+
+      <!-- Score / streak / rounds -->
+      <section class="stats-row">
+        <div class="stat-box">
+          <span class="stat-label">You</span>
+          <span class="stat-value win" id="playerWinsValue">0</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-label">Computer</span>
+          <span class="stat-value lose" id="computerWinsValue">0</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-label">Draws</span>
+          <span class="stat-value" id="drawsValue">0</span>
+        </div>
+        <div class="stat-box highlight">
+          <span class="stat-label">Streak</span>
+          <span class="stat-value streak" id="streakValue">0</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-label">Round</span>
+          <span class="stat-value" id="roundValue">0</span>
+        </div>
+      </section>
+
+      <!-- Arena -->
+      <section class="arena">
+        <div class="arena-side player">
+          <span class="arena-label">You</span>
+          <div class="hand-stage" id="playerStage">
+            <div class="hand-visual-wrap" id="playerHandWrap"></div>
+          </div>
+          <span class="move-name" id="playerMoveName">Rock</span>
+        </div>
+
+        <span class="arena-vs">VS</span>
+
+        <div class="arena-side computer">
+          <span class="arena-label">Computer</span>
+          <div class="hand-stage" id="computerStage">
+            <div class="hand-visual-wrap" id="computerHandWrap"></div>
+          </div>
+          <span class="move-name" id="computerMoveName">Rock</span>
+        </div>
+      </section>
+
+      <!-- Status -->
+      <section class="round-status">
+        <p class="status-text" id="statusText">Pick a move to begin</p>
+        <p class="relationship-text" id="relationshipText"></p>
+      </section>
+
+      <!-- Moves -->
+      <section class="moves-panel">
+        <span class="moves-label">Choose your move</span>
+        <div class="moves-grid" id="movesGrid"></div>
+      </section>
+
+      <!-- Controls -->
+      <div class="game-controls">
+        <button class="btn btn-secondary" id="resetBtn" type="button">🔄 New Game</button>
+      </div>
+
+    </section>
+
+    <!-- ============================================================
+         HOW TO PLAY MODAL (opened via the ❓ Help button on the Mode
+         Selection screen) — one modal covering both modes.
+    ============================================================= -->
+    <div class="modal-overlay" id="rpsHelpModalOverlay" hidden>
+      <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="rpsHelpModalTitle">
+        <div class="modal-header">
+          <h3 class="modal-title" id="rpsHelpModalTitle">✊ How to Play – RPS</h3>
+          <button class="modal-close-btn" id="rpsHelpModalCloseBtn" type="button" aria-label="Close rules">✕</button>
+        </div>
+        <div class="modal-body">
+          <p class="help-section-title">Classic</p>
+          <ul class="help-list">
+            <li>Choose Rock, Paper, or Scissors.</li>
+            <li>Rock beats Scissors.</li>
+            <li>Scissors beats Paper.</li>
+            <li>Paper beats Rock.</li>
+            <li>Same move = Draw.</li>
+          </ul>
+
+          <p class="help-section-title">Extended</p>
+          <ul class="help-list">
+            <li>✊ <strong>Rock</strong> → Scissors, Lizard</li>
+            <li>✋ <strong>Paper</strong> → Rock, Spock</li>
+            <li>✌️ <strong>Scissors</strong> → Paper, Lizard</li>
+            <li>🦎 <strong>Lizard</strong> → Spock, Paper</li>
+            <li>🖖 <strong>Spock</strong> → Scissors, Rock</li>
+            <li>🔥 <strong>Fire</strong> → Paper, Lizard, Water</li>
+            <li>💧 <strong>Water</strong> → Rock, Scissors, Spock</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <script type="module" src="../js/rps.js"></script>
+</body>
+</html>

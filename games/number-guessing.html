@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Number Guessing — Web Mini Games Hub</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+<link rel="stylesheet" href="../css/number-guessing.css" />
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to main content</a>
+
+  <div class="bg-scene" aria-hidden="true">
+    <span class="orb orb-cyan"></span>
+    <span class="orb orb-magenta"></span>
+    <span class="orb orb-violet"></span>
+  </div>
+
+  <!-- ============================= TOP BAR ============================= -->
+  <header class="topbar">
+    <button class="back-btn" id="backBtn" type="button">
+      <span class="back-arrow">←</span>
+      <span id="backBtnLabel">Back to Hub</span>
+    </button>
+    <h1 class="topbar-title" id="topbarTitle">🔢 Number Guessing</h1>
+    <div class="topbar-actions">
+      <button class="icon-btn" id="soundToggleBtn" type="button" aria-label="Mute sound" aria-pressed="false">🔊</button>
+      <div class="coin-pill" id="coinPill">
+        <span class="coin-icon">🪙</span>
+        <span class="coin-amount" id="coinAmount">—</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Purchase / feedback banner -->
+  <p class="page-banner" id="pageBanner"></p>
+
+  <!-- ============================= MAIN ============================= -->
+  <main id="main-content" class="game-page">
+
+    <!-- ============================================================
+         SCREEN 1 — SETUP (range + difficulty)
+    ============================================================= -->
+    <section class="screen setup-screen active" id="setupScreen">
+      <div class="screen-title-row">
+        <h2 class="screen-title">Number Guessing</h2>
+        <button class="icon-btn help-btn" id="guessHelpBtn" type="button" aria-label="How to play Number Guessing">❓</button>
+      </div>
+      <p class="screen-subtitle">Pick a range, choose a difficulty, and crack the number</p>
+
+      <section class="controls-panel">
+        <div class="control-group">
+          <span class="control-label">Range</span>
+          <div class="segmented segmented-4" id="rangeSegmented" role="tablist">
+            <button class="segment active" data-range="50" role="tab" aria-selected="true">1–50</button>
+            <button class="segment" data-range="100" role="tab" aria-selected="false">1–100</button>
+            <button class="segment" data-range="500" role="tab" aria-selected="false">1–500</button>
+            <button class="segment" data-range="1000" role="tab" aria-selected="false">1–1000</button>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <span class="control-label">Difficulty</span>
+          <div class="segmented segmented-3" id="difficultySegmented" role="tablist">
+            <button class="segment active" data-difficulty="easy" role="tab" aria-selected="true">Easy</button>
+            <button class="segment" data-difficulty="medium" role="tab" aria-selected="false">Medium</button>
+            <button class="segment" data-difficulty="hard" role="tab" aria-selected="false">Hard</button>
+          </div>
+        </div>
+
+        <p class="setup-hint-text" id="setupSummary">Up to 11 attempts · Hints start at 12 🪙</p>
+      </section>
+
+      <button class="btn btn-primary btn-block" id="startGameBtn" type="button">🎯 Start Guessing</button>
+    </section>
+
+    <!-- ============================================================
+         SCREEN 2 — GAME
+    ============================================================= -->
+    <section class="screen game-screen" id="gameScreen">
+
+      <div class="screen-header">
+        <h2 class="screen-header-title" id="gameTitle">🔢 Easy — 1–50</h2>
+      </div>
+
+      <!-- Attempts + Score + Hints -->
+      <section class="stats-row">
+        <div class="stat-box">
+          <span class="stat-label">🎯 Attempts</span>
+          <span class="stat-value" id="attemptsValue">0 / 11</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-label">⭐ Score</span>
+          <span class="stat-value" id="scoreValue">100</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-label">💡 Hints Used</span>
+          <span class="stat-value" id="hintsUsedValue">0</span>
+        </div>
+      </section>
+
+      <!-- Hint -->
+      <div class="hint-row">
+        <button class="hint-btn" id="hintBtn" type="button">
+          💡 Use Hint <span class="hint-cost" id="hintCostLabel">— 12 🪙</span>
+        </button>
+        <div class="hint-log" id="hintLog" aria-live="polite"></div>
+      </div>
+
+      <!-- Guess input -->
+      <form class="guess-form" id="guessForm" autocomplete="off">
+        <input
+          class="guess-input"
+          id="guessInput"
+          type="number"
+          inputmode="numeric"
+          placeholder="Enter your guess"
+          aria-label="Your guess"
+        />
+        <button class="btn btn-primary guess-submit" id="guessSubmitBtn" type="submit">Guess</button>
+      </form>
+
+      <!-- Feedback -->
+      <p class="guess-feedback" id="guessFeedback">Guess a number between 1 and 50.</p>
+
+      <!-- History -->
+      <div class="guess-history" id="guessHistory" aria-label="Previous guesses"></div>
+
+      <!-- Controls -->
+      <div class="game-controls">
+        <button class="btn btn-secondary" id="restartBtn" type="button">🔄 New Number</button>
+      </div>
+
+      <!-- Completion overlay -->
+      <div class="completion-overlay" id="completionOverlay" hidden>
+        <div class="completion-card">
+          <span class="completion-icon" id="completionIcon">🏆</span>
+          <h3 class="completion-title" id="completionTitle">You Got It!</h3>
+          <p class="completion-subtitle" id="completionSubtitle">The number was 42.</p>
+          <div class="completion-stats">
+            <div class="completion-stat">
+              <span class="completion-label">Attempts</span>
+              <span class="completion-value" id="completionAttempts">0</span>
+            </div>
+            <div class="completion-stat">
+              <span class="completion-label">Score</span>
+              <span class="completion-value" id="completionScore">0</span>
+            </div>
+            <div class="completion-stat">
+              <span class="completion-label">Coins Earned</span>
+              <span class="completion-value" id="completionCoins">+0 🪙</span>
+            </div>
+          </div>
+          <div class="completion-actions">
+            <button class="btn btn-primary" id="playAgainBtn" type="button">🔄 Play Again</button>
+            <button class="btn btn-secondary" id="changeSetupFromCompletionBtn" type="button">← Change Setup</button>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ============================================================
+         HOW TO PLAY MODAL (opened via the ❓ Help button)
+    ============================================================= -->
+    <div class="modal-overlay" id="guessHelpModalOverlay" hidden>
+      <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="guessHelpModalTitle">
+        <div class="modal-header">
+          <h3 class="modal-title" id="guessHelpModalTitle">❓ How to Play – Number Guessing</h3>
+          <button class="modal-close-btn" id="guessHelpModalCloseBtn" type="button" aria-label="Close rules">✕</button>
+        </div>
+        <div class="modal-body">
+          <ul class="help-list">
+            <li>Choose a number range.</li>
+            <li>Guess the hidden number.</li>
+            <li>The game tells you Higher or Lower.</li>
+            <li>Keep guessing until you find it.</li>
+          </ul>
+
+          <p class="help-section-title">Ranges</p>
+          <ul class="help-list">
+            <li>1–50 · 1–100 · 1–500 · 1–1000</li>
+          </ul>
+
+          <p class="help-section-title">Hints</p>
+          <ul class="help-list">
+            <li>Spend coins to get a hint.</li>
+            <li>Even/Odd, Prime/Composite, divisibility, and more.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <script type="module" src="../js/number-guessing.js"></script>
+</body>
+</html>

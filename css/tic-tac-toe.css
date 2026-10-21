@@ -1,0 +1,976 @@
+/* ===================================================================
+   Web Mini Games Hub — Tic Tac Toe
+   Same design system as the rest of the app.
+=================================================================== */
+
+:root{
+  --bg-deep:        #0a0e27;
+  --bg-deep-2:      #150a30;
+  --panel:          rgba(255, 255, 255, 0.06);
+  --panel-border:   rgba(255, 255, 255, 0.14);
+
+  --neon-cyan:      #00f0ff;
+  --neon-magenta:   #ff2e9a;
+  --neon-violet:    #8b5cff;
+  --neon-gold:      #ffc94d;
+
+  --text-hi:        #f4f6ff;
+  --text-mid:       rgba(244, 246, 255, 0.72);
+  --text-low:       rgba(244, 246, 255, 0.46);
+
+  --success:        #35e0a1;
+  --danger:          #ff5470;
+
+  --radius-lg: 22px;
+  --radius-md: 16px;
+  --radius-sm: 10px;
+
+  --ease: cubic-bezier(.22, 1, .36, 1);
+}
+
+*{ box-sizing: border-box; }
+html, body{ height: 100%; }
+
+body{
+  margin: 0;
+  min-height: 100vh;
+  font-family: 'Poppins', sans-serif;
+  color: var(--text-hi);
+  background:
+    radial-gradient(1200px 800px at 15% 0%, #1c1050 0%, transparent 60%),
+    radial-gradient(1000px 700px at 85% 100%, #0e1f4a 0%, transparent 60%),
+    linear-gradient(160deg, var(--bg-deep) 0%, var(--bg-deep-2) 100%);
+  /* The root element deliberately has NO background of its own, so
+     these properties propagate from <body> to the page canvas and are
+     painted across the whole canvas rather than being clipped to
+     body's box. Combined with `fixed`, the gradient is positioned
+     against the viewport, so it can never tile or run out no matter
+     how tall the document gets or where the user has scrolled. */
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-size: cover;
+  /* Declared AFTER the shorthand (which resets background-color to
+     transparent) so it survives. Propagates to the canvas too and
+     backs the whole document, covering iOS overscroll bounce. */
+  background-color: var(--bg-deep);
+  overflow-x: hidden;
+  transition: background 0.5s var(--ease);
+}
+
+@media (prefers-reduced-motion: reduce){
+  *, *::before, *::after{
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+button{ font-family: inherit; }
+
+/* ---------------------------------------------------------------
+   Ambient background
+--------------------------------------------------------------- */
+.bg-scene{ position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+.orb{ position: absolute; border-radius: 50%; filter: blur(70px); opacity: 0.3; animation: drift 20s var(--ease) infinite alternate; transition: background 0.5s var(--ease); }
+.orb-cyan{ width: 380px; height: 380px; background: var(--neon-cyan); top: -8%; left: 4%; }
+.orb-magenta{ width: 420px; height: 420px; background: var(--neon-magenta); bottom: -12%; right: 6%; animation-duration: 24s; }
+.orb-violet{ width: 300px; height: 300px; background: var(--neon-violet); top: 40%; right: 30%; animation-duration: 16s; }
+@keyframes drift{ from{ transform: translate(0,0) scale(1); } to{ transform: translate(50px,-30px) scale(1.15); } }
+
+/* ===================================================================
+   TOP BAR
+=================================================================== */
+.topbar{
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 28px;
+  background: rgba(10, 14, 39, 0.55);
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  border-bottom: 1px solid var(--panel-border);
+}
+.topbar-title{
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+@media (max-width: 560px){ .topbar-title{ display: none; } }
+
+.back-btn{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  color: var(--text-hi);
+  font-size: 13.5px;
+  font-weight: 500;
+  padding: 9px 16px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: border-color 0.2s var(--ease), transform 0.2s var(--ease), background 0.2s var(--ease);
+}
+.back-btn:hover{ border-color: var(--neon-cyan); background: rgba(0, 240, 255, 0.1); transform: translateX(-2px); }
+.back-arrow{ font-size: 15px; }
+
+.topbar-actions{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.icon-btn{
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  color: var(--text-hi);
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: border-color 0.2s var(--ease), transform 0.2s var(--ease), background 0.2s var(--ease);
+}
+.icon-btn:hover{ border-color: var(--neon-cyan); background: rgba(0, 240, 255, 0.1); transform: translateY(-2px); }
+.icon-btn:active{ transform: translateY(0) scale(0.94); }
+
+.coin-pill{
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: rgba(255, 201, 77, 0.1);
+  border: 1px solid rgba(255, 201, 77, 0.3);
+  color: var(--neon-gold);
+  font-weight: 600;
+  font-size: 14px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  transition: transform 0.2s var(--ease);
+}
+.coin-pill.pulse{ animation: coinPulse 0.5s var(--ease); }
+@keyframes coinPulse{
+  0%{ transform: scale(1); }
+  40%{ transform: scale(1.12); box-shadow: 0 0 18px rgba(255, 201, 77, 0.5); }
+  100%{ transform: scale(1); }
+}
+
+/* ===================================================================
+   PAGE LAYOUT
+=================================================================== */
+.game-page{
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  margin: 0 auto;
+  padding: 26px 20px 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ===================================================================
+   SCREENS — Mode Select / Classic / Ultimate. Exactly one is visible
+   at a time; the other two are fully removed from layout (display:none)
+   rather than just hidden visually, so their boards never overlap.
+=================================================================== */
+.screen{
+  display: none;
+  width: 100%;
+  margin: 0 auto;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+.screen.active{ display: flex; animation: fadeIn 0.35s var(--ease); }
+
+.mode-select-screen{ max-width: 640px; }
+.classic-screen{ max-width: 560px; }
+.ultimate-screen{ max-width: 760px; }
+
+/* ===================================================================
+   CONTROLS PANEL — mode + difficulty
+=================================================================== */
+.controls-panel{
+  width: 100%;
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-lg);
+  padding: 18px 20px;
+  backdrop-filter: blur(18px) saturate(150%);
+  -webkit-backdrop-filter: blur(18px) saturate(150%);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  animation: rise 0.5s var(--ease) both;
+}
+@keyframes rise{ from{ opacity: 0; transform: translateY(12px); } to{ opacity: 1; transform: translateY(0); } }
+
+.control-group{ display: flex; flex-direction: column; gap: 8px; }
+.control-label{
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-low);
+}
+
+.segmented{
+  display: flex;
+  gap: 6px;
+  background: rgba(255,255,255,0.05);
+  border-radius: var(--radius-md);
+  padding: 4px;
+}
+.segment{
+  flex: 1;
+  border: none;
+  background: transparent;
+  color: var(--text-mid);
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 9px 8px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.25s var(--ease), color 0.25s var(--ease);
+  white-space: nowrap;
+}
+.segment.active{
+  background: linear-gradient(120deg, var(--neon-cyan), var(--neon-violet));
+  color: var(--bg-deep);
+  box-shadow: 0 0 14px rgba(0, 240, 255, 0.3);
+}
+.segment:not(.active):hover{ background: rgba(255,255,255,0.06); color: var(--text-hi); }
+
+/* ===================================================================
+   SCOREBOARD
+=================================================================== */
+.scoreboard{
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 0.7fr 1fr;
+  gap: 10px;
+  animation: rise 0.5s 0.05s var(--ease) both;
+}
+.score-box{
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-md);
+  padding: 14px 10px;
+  text-align: center;
+  transition: border-color 0.25s var(--ease), box-shadow 0.25s var(--ease), transform 0.25s var(--ease);
+}
+.score-box.active-turn{
+  border-color: var(--neon-cyan);
+  box-shadow: 0 0 18px rgba(0, 240, 255, 0.2);
+  transform: translateY(-2px);
+}
+.score-label{
+  display: block;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--text-low);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  margin-bottom: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.score-value{ font-size: 24px; font-weight: 800; }
+.score-x .score-value{ color: var(--neon-cyan); }
+.score-o .score-value{ color: var(--neon-magenta); }
+.score-draw .score-value{ color: var(--text-mid); font-size: 20px; }
+
+/* ===================================================================
+   STATUS LINE
+=================================================================== */
+.status-line{
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  text-align: center;
+  min-height: 22px;
+  animation: fadeIn 0.3s var(--ease);
+}
+@keyframes fadeIn{ from{ opacity: 0; } to{ opacity: 1; } }
+.status-line.win{ color: var(--success); }
+.status-line.lose{ color: var(--danger); }
+.status-line.thinking{ color: var(--text-mid); }
+.status-line.thinking::after{
+  content: "";
+  display: inline-block;
+  width: 1ch;
+  animation: dots 1.2s steps(4, end) infinite;
+}
+@keyframes dots{
+  0%{ content: ""; }
+  25%{ content: "."; }
+  50%{ content: ".."; }
+  75%{ content: "..."; }
+}
+
+/* ===================================================================
+   BOARD — fixed-aspect grid so cells NEVER resize when marks are added
+=================================================================== */
+.board-wrap{
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  animation: rise 0.5s 0.1s var(--ease) both;
+}
+
+.board{
+  position: relative;
+  width: 100%;
+  max-width: 380px;
+  aspect-ratio: 1 / 1;         /* board is always a perfect square */
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-rows: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.cell{
+  aspect-ratio: 1 / 1;          /* each cell is independently locked square */
+  min-width: 0;
+  min-height: 0;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: background 0.2s var(--ease), border-color 0.2s var(--ease), transform 0.15s var(--ease);
+}
+.cell:hover:not(.filled):not(.disabled){
+  background: rgba(0, 240, 255, 0.08);
+  border-color: rgba(0, 240, 255, 0.35);
+}
+.cell:active:not(.filled):not(.disabled){ transform: scale(0.96); }
+.cell.disabled{ cursor: default; }
+
+.cell.win-cell{
+  background: rgba(53, 224, 161, 0.14);
+  border-color: rgba(53, 224, 161, 0.5);
+}
+
+/* Marks are SVGs with a fixed viewBox — their "content" never
+   changes the cell's box size, which is what caused the shrink bug
+   this build fixes. Sizing here is always a fixed % of the cell. */
+.mark{
+  width: 58%;
+  height: 58%;
+  overflow: visible;
+  pointer-events: none;
+}
+.mark-x line{
+  stroke: var(--neon-cyan);
+  stroke-width: 11;
+  stroke-linecap: round;
+  stroke-dasharray: 90;
+  stroke-dashoffset: 90;
+  filter: drop-shadow(0 0 6px rgba(0, 240, 255, 0.6));
+  transition: stroke-dashoffset 0.28s var(--ease);
+}
+.mark-x.drawn line{ stroke-dashoffset: 0; }
+
+.mark-o circle{
+  stroke: var(--neon-magenta);
+  stroke-width: 11;
+  fill: none;
+  stroke-dasharray: 220;
+  stroke-dashoffset: 220;
+  filter: drop-shadow(0 0 6px rgba(255, 46, 154, 0.6));
+  transition: stroke-dashoffset 0.32s var(--ease);
+  transform: rotate(-90deg);
+  transform-origin: center;
+}
+.mark-o.drawn circle{ stroke-dashoffset: 0; }
+
+/* Winning strike-through line */
+.win-line{
+  position: absolute;
+  height: 6px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--neon-cyan), var(--success));
+  box-shadow: 0 0 14px rgba(53, 224, 161, 0.7);
+  transform-origin: left center;
+  left: 0;
+  top: 0;
+  width: 0;
+  transition: width 0.4s var(--ease);
+  pointer-events: none;
+}
+.win-line.show{ /* width + transform set inline via JS */ }
+
+/* Board shake on invalid click, subtle */
+.board.shake{ animation: shake 0.3s var(--ease); }
+@keyframes shake{
+  0%, 100%{ transform: translateX(0); }
+  25%{ transform: translateX(-4px); }
+  75%{ transform: translateX(4px); }
+}
+
+@media (max-width: 420px){
+  .board{ max-width: 320px; gap: 8px; }
+}
+
+/* ===================================================================
+   GAME CONTROLS
+=================================================================== */
+.game-controls{
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  animation: rise 0.5s 0.15s var(--ease) both;
+}
+
+.btn{
+  flex: 1;
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 14px;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 13px 18px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: transform 0.2s var(--ease), filter 0.2s var(--ease), background 0.2s var(--ease);
+}
+.btn-primary{
+  color: var(--bg-deep);
+  background: linear-gradient(120deg, var(--neon-cyan), var(--neon-magenta));
+  box-shadow: 0 6px 20px rgba(255, 46, 154, 0.22);
+}
+.btn-primary:hover{ transform: translateY(-2px); filter: brightness(1.06); }
+.btn-secondary{
+  color: var(--text-hi);
+  background: rgba(255,255,255,0.06);
+  border: 1px solid var(--panel-border);
+}
+.btn-secondary:hover{ border-color: var(--neon-violet); background: rgba(139, 92, 255, 0.1); }
+
+@media (max-width: 420px){
+  .game-controls{ flex-direction: column; }
+}
+
+/* ===================================================================
+   PAGE BANNER — purchase confirmations / errors (Vanishing Mode unlock)
+=================================================================== */
+.page-banner{
+  display: none;
+  position: relative;
+  z-index: 2;
+  width: min(92vw, 560px);
+  margin: 14px auto 0;
+  font-size: 13px;
+  font-weight: 500;
+  text-align: center;
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  animation: bannerShake 0.4s var(--ease);
+}
+.page-banner.show{ display: block; }
+.page-banner.error{
+  background: rgba(255, 84, 112, 0.12);
+  border: 1px solid rgba(255, 84, 112, 0.35);
+  color: #ffb3c1;
+}
+.page-banner.success{
+  background: rgba(53, 224, 161, 0.12);
+  border: 1px solid rgba(53, 224, 161, 0.35);
+  color: #9dffdd;
+}
+@keyframes bannerShake{
+  0%, 100%{ transform: translateX(0); }
+  25%{ transform: translateX(-5px); }
+  75%{ transform: translateX(5px); }
+}
+
+/* ===================================================================
+   MODE SELECTION SCREEN
+=================================================================== */
+.screen-title{
+  margin: 4px 0 0;
+  font-size: 26px;
+  font-weight: 800;
+  text-align: center;
+  background: linear-gradient(120deg, var(--neon-cyan), var(--neon-magenta));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.screen-subtitle{
+  margin: 0;
+  font-size: 13.5px;
+  color: var(--text-mid);
+  text-align: center;
+}
+
+.mode-cards{
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 18px;
+  width: 100%;
+}
+.mode-card{
+  flex: 1 1 230px;
+  max-width: 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 10px;
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-lg);
+  padding: 30px 22px;
+  color: var(--text-hi);
+  cursor: pointer;
+  backdrop-filter: blur(18px) saturate(150%);
+  -webkit-backdrop-filter: blur(18px) saturate(150%);
+  transition: transform 0.25s var(--ease), border-color 0.25s var(--ease), box-shadow 0.25s var(--ease);
+  animation: rise 0.5s var(--ease) both;
+}
+.mode-card:nth-child(2){ animation-delay: 0.06s; }
+.mode-card:hover{
+  transform: translateY(-5px);
+  border-color: var(--neon-cyan);
+  box-shadow: 0 12px 32px rgba(0, 240, 255, 0.18);
+}
+.mode-card:active{ transform: translateY(-2px) scale(0.99); }
+.mode-card.selected{
+  border-color: var(--neon-cyan);
+  box-shadow: 0 0 0 2px rgba(0, 240, 255, 0.35), 0 12px 32px rgba(0, 240, 255, 0.18);
+}
+.mode-card-icon{
+  font-size: 42px;
+  filter: drop-shadow(0 0 12px rgba(0, 240, 255, 0.45));
+}
+.mode-card-title{ font-size: 17.5px; font-weight: 700; }
+.mode-card-desc{ font-size: 12.5px; line-height: 1.5; color: var(--text-mid); }
+
+.btn-block{ width: 100%; }
+
+/* ===================================================================
+   SCREEN HEADER — used by Classic + Ultimate screens
+=================================================================== */
+.screen-header{
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  animation: rise 0.4s var(--ease) both;
+}
+.screen-header-title{
+  margin: 0;
+  font-size: 18px;
+  font-weight: 800;
+  flex: 1;
+  text-align: center;
+}
+@media (max-width: 480px){
+  .screen-header-title{ font-size: 16px; }
+}
+
+/* ===================================================================
+   VANISHING MODE — toggle switch + coin-lock badge
+=================================================================== */
+.vanishing-group{ border-top: 1px solid var(--panel-border); padding-top: 14px; }
+.toggle-row{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+.toggle-info{ display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.toggle-desc{ font-size: 11px; color: var(--text-low); line-height: 1.3; }
+
+.toggle-switch{
+  position: relative;
+  flex-shrink: 0;
+  width: 46px;
+  height: 26px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid var(--panel-border);
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.25s var(--ease), border-color 0.25s var(--ease);
+}
+.toggle-switch::after{
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--text-hi);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  transition: transform 0.25s var(--ease);
+}
+.toggle-switch.on{
+  background: linear-gradient(120deg, var(--neon-cyan), var(--neon-violet));
+  border-color: transparent;
+  box-shadow: 0 0 14px rgba(0, 240, 255, 0.35);
+}
+.toggle-switch.on::after{ transform: translateX(20px); }
+.toggle-switch.locked::after{ background: var(--text-mid); }
+.toggle-switch:hover{ border-color: var(--neon-gold); }
+
+.feature-lock-badge{
+  margin-top: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--neon-gold);
+  background: rgba(255, 201, 77, 0.1);
+  border: 1px solid rgba(255, 201, 77, 0.3);
+  padding: 5px 11px;
+  border-radius: 999px;
+}
+.feature-lock-badge .lock-icon{ font-size: 12px; }
+
+/* ===================================================================
+   VANISHING ANIMATIONS — applied to Classic .cell elements
+=================================================================== */
+.cell.vanishing .mark{
+  animation: vanishOut 0.46s var(--ease) forwards;
+}
+@keyframes vanishOut{
+  0%{ opacity: 1; transform: scale(1); filter: blur(0); }
+  55%{ opacity: 0.55; transform: scale(1.12); filter: blur(1px); }
+  100%{ opacity: 0; transform: scale(0.35) rotate(18deg); filter: blur(3px); }
+}
+.cell.about-to-vanish{
+  animation: aboutToVanishPulse 1s ease-in-out infinite;
+}
+@keyframes aboutToVanishPulse{
+  0%, 100%{ box-shadow: inset 0 0 0 rgba(255, 84, 112, 0); border-color: var(--panel-border); }
+  50%{ box-shadow: inset 0 0 16px rgba(255, 84, 112, 0.55); border-color: rgba(255, 84, 112, 0.6); }
+}
+
+/* ===================================================================
+   ULTIMATE MODE — 3x3 grid of 3x3 mini-boards
+   Sizing uses min()/clamp() so cells scale fluidly with the viewport
+   and never overflow the page; a min-width floor + local overflow-x
+   auto on the wrapper is a safety net, not the normal path.
+=================================================================== */
+.ultimate-board-wrap{
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  overflow-x: auto;
+  padding-bottom: 2px;
+  animation: rise 0.5s 0.1s var(--ease) both;
+}
+
+.ultimate-board{
+  position: relative;
+  width: min(96vw, 660px);
+  min-width: 300px;
+  aspect-ratio: 1 / 1;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-rows: repeat(3, minmax(0, 1fr));
+  gap: clamp(6px, 1.6vw, 14px);
+  padding: clamp(6px, 1.6vw, 14px);
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-lg);
+  backdrop-filter: blur(18px) saturate(150%);
+  -webkit-backdrop-filter: blur(18px) saturate(150%);
+}
+
+.mini-board{
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  aspect-ratio: 1 / 1;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-rows: repeat(3, minmax(0, 1fr));
+  gap: clamp(2px, 0.8vw, 5px);
+  padding: clamp(2px, 0.8vw, 5px);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1.5px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  transition: border-color 0.25s var(--ease), box-shadow 0.25s var(--ease), background 0.25s var(--ease), opacity 0.25s var(--ease);
+}
+.mini-board.playable{
+  border-color: var(--neon-cyan);
+  background: rgba(0, 240, 255, 0.05);
+  box-shadow: 0 0 16px rgba(0, 240, 255, 0.3), inset 0 0 16px rgba(0, 240, 255, 0.08);
+}
+.mini-board.decided{ opacity: 0.9; }
+.mini-board.drawn{ opacity: 0.5; }
+.mini-board.won-x{ border-color: rgba(0, 240, 255, 0.55); }
+.mini-board.won-o{ border-color: rgba(255, 46, 154, 0.55); }
+.mini-board.meta-win-board{
+  border-color: var(--success);
+  box-shadow: 0 0 18px rgba(53, 224, 161, 0.5);
+}
+
+.mini-cell{
+  min-width: 0;
+  min-height: 0;
+  aspect-ratio: 1 / 1;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: background 0.15s var(--ease), border-color 0.15s var(--ease), transform 0.1s var(--ease);
+}
+.mini-cell .mark{ width: 62%; height: 62%; }
+.mini-cell .mark-x line{ stroke-width: 14; }
+.mini-cell .mark-o circle{ stroke-width: 14; }
+.mini-cell:hover:not(.filled):not(.disabled):not(.inactive){
+  background: rgba(0, 240, 255, 0.1);
+  border-color: rgba(0, 240, 255, 0.35);
+}
+.mini-cell:active:not(.filled):not(.disabled):not(.inactive){ transform: scale(0.92); }
+.mini-cell.disabled{ cursor: default; }
+.mini-cell.inactive{ cursor: default; opacity: 0.35; }
+
+/* Once a mini-board is decided, its individual small X/O marks are
+   hidden — the single large overlay symbol is the only thing that
+   should read visually from then on. */
+.mini-board.decided .mini-cell .mark{
+  opacity: 0;
+  transition: opacity 0.3s var(--ease);
+}
+.mini-board.decided .mini-cell{
+  background: transparent;
+  border-color: transparent;
+}
+
+.mini-board-overlay{
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  opacity: 0;
+  transform: scale(0.4);
+  pointer-events: none;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  transition: opacity 0.35s var(--ease), transform 0.35s var(--ease);
+}
+.mini-board-overlay.show{ opacity: 1; transform: scale(1); }
+
+/* Large mark inside the overlay — same neon SVG glyph used for
+   normal cells, just scaled up significantly with a stronger glow
+   so it clearly reads as "this whole board belongs to X/O now". */
+.mini-board-overlay .mark{ width: 68%; height: 68%; }
+.mini-board-overlay .mark-x line{
+  stroke-width: 16;
+  filter: drop-shadow(0 0 14px rgba(0, 240, 255, 0.85));
+}
+.mini-board-overlay .mark-o circle{
+  stroke-width: 16;
+  filter: drop-shadow(0 0 14px rgba(255, 46, 154, 0.85));
+}
+
+.mini-board-overlay.win-x{
+  background: linear-gradient(135deg, rgba(0, 240, 255, 0.2), rgba(10, 14, 39, 0.94));
+}
+.mini-board-overlay.win-o{
+  background: linear-gradient(135deg, rgba(255, 46, 154, 0.2), rgba(10, 14, 39, 0.94));
+}
+.mini-board-overlay.draw{
+  background: rgba(10, 14, 39, 0.9);
+}
+.overlay-draw{
+  font-weight: 800;
+  font-size: clamp(20px, 6vw, 38px);
+  color: var(--text-mid);
+}
+
+.ultimate-win-line{
+  background: linear-gradient(90deg, var(--neon-cyan), var(--success));
+  box-shadow: 0 0 18px rgba(53, 224, 161, 0.8);
+  height: 8px;
+}
+
+@media (max-width: 420px){
+  .ultimate-board{ gap: 5px; padding: 5px; }
+}
+
+/* ---------------------------------------------------------------
+   Skip link (accessibility) — invisible until keyboard-focused, so
+   keyboard/screen-reader users can jump straight past the topbar to
+   #main-content instead of tabbing through every nav control first.
+--------------------------------------------------------------- */
+.skip-link{
+  position: absolute;
+  top: -3rem;
+  left: 1rem;
+  z-index: 1000;
+  padding: 0.65rem 1.25rem;
+  background: #ffffff;
+  color: #111111;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-decoration: none;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  transition: top 0.2s ease;
+}
+.skip-link:focus{
+  top: 1rem;
+  outline: 3px solid #6c5ce7;
+  outline-offset: 2px;
+}
+
+/* ===================================================================
+   HELP (?) BUTTON + "HOW TO PLAY" MODAL
+   Same button, modal design, close button, and animation as the
+   Rock Paper Scissors Help modal, reused here for consistency.
+=================================================================== */
+.screen-title-row{
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.screen-title-row .screen-title{ width: 100%; }
+
+.help-btn{
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 34px;
+  height: 34px;
+  font-size: 15px;
+}
+.help-btn:hover{ transform: translateY(-50%) translateY(-2px); }
+
+.modal-overlay{
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(6, 8, 22, 0.72);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  animation: fadeIn 0.2s var(--ease);
+}
+.modal-overlay[hidden]{ display: none; }
+
+.modal-box{
+  width: 100%;
+  max-width: 420px;
+  max-height: min(78vh, 560px);
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-deep-2);
+  background-image:
+    radial-gradient(600px 300px at 100% 0%, rgba(0,240,255,0.08), transparent 60%),
+    radial-gradient(600px 300px at 0% 100%, rgba(255,46,154,0.08), transparent 60%);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 24px 60px rgba(0,0,0,0.45);
+  overflow: hidden;
+  animation: modalPop 0.25s var(--ease);
+}
+@keyframes modalPop{
+  from{ opacity: 0; transform: scale(0.94) translateY(8px); }
+  to{ opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.modal-header{
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 16px 16px 20px;
+  border-bottom: 1px solid var(--panel-border);
+}
+.modal-title{
+  margin: 0;
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text-hi);
+}
+.modal-close-btn{
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  color: var(--text-hi);
+  font-size: 13px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: border-color 0.2s var(--ease), background 0.2s var(--ease), transform 0.2s var(--ease);
+}
+.modal-close-btn:hover{ border-color: var(--danger); background: rgba(255, 84, 112, 0.14); transform: scale(1.06); }
+.modal-close-btn:active{ transform: scale(0.94); }
+
+.modal-body{
+  padding: 16px 20px 20px;
+  overflow-y: auto;
+}
+
+.help-list{
+  margin: 0;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--text-mid);
+}
+.help-list[hidden]{ display: none; }
+.help-list li::marker{ color: var(--neon-magenta); }
+.help-section-title{
+  margin: 16px 0 6px;
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--neon-cyan);
+}
+.help-section-title:first-child{ margin-top: 0; }

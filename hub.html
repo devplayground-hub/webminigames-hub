@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Web Mini Games Hub — Dashboard</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+<link rel="stylesheet" href="css/hub.css" />
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to main content</a>
+
+  <!-- Ambient background, same motif as the auth page -->
+  <div class="bg-scene" aria-hidden="true">
+    <span class="orb orb-cyan"></span>
+    <span class="orb orb-magenta"></span>
+    <span class="orb orb-violet"></span>
+  </div>
+
+  <!-- ============================= TOP NAV ============================= -->
+  <header class="navbar">
+    <div class="navbar-brand">
+      <div class="brand-mark">
+        <span class="brand-ring"></span>
+        <span class="brand-glyph">WM</span>
+      </div>
+      <span class="brand-name">Web Mini Games Hub</span>
+    </div>
+
+    <div class="navbar-actions">
+
+      <div class="coin-pill" id="coinPill" title="Your coin balance">
+        <span class="coin-icon">🪙</span>
+        <span class="coin-amount" id="coinAmount">—</span>
+      </div>
+
+      <!-- Settings -->
+      <button class="icon-btn" id="settingsBtn" aria-label="Settings">⚙️</button>
+
+      <!-- Avatar / profile menu -->
+      <div class="nav-popover-wrap">
+        <button class="avatar-btn" id="avatarBtn" aria-haspopup="true" aria-expanded="false">
+          <span class="avatar-circle" id="avatarCircle">?</span>
+          <span class="username" id="usernameLabel">Loading…</span>
+          <span class="chevron">▾</span>
+        </button>
+        <div class="popover" id="profilePopover" hidden>
+          <div class="popover-body">
+            <button class="popover-link" id="viewProfileBtn">👤 View Profile</button>
+            <button class="popover-link" id="logoutBtn">🚪 Log Out</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ============================= MAIN ============================= -->
+  <main id="main-content" class="dashboard">
+
+    <!-- Hero banner -->
+    <section class="hero" id="hero">
+      <div class="hero-glow" aria-hidden="true"></div>
+      <div class="hero-content">
+        <div class="hero-avatar" id="heroAvatar">?</div>
+        <div class="hero-text">
+          <h1 id="heroGreeting">Welcome back</h1>
+          <p id="heroSubtitle">Loading your stats…</p>
+        </div>
+      </div>
+      <div class="hero-chips" id="heroChips"><!-- injected --></div>
+      <div class="hero-glyphs" aria-hidden="true">
+        <span>🎲</span><span>🕹️</span><span>♠</span><span>🧩</span>
+      </div>
+    </section>
+
+    <!-- Games column -->
+    <section class="games-column">
+
+      <div class="section-heading">
+        <h2>Choose your game</h2>
+        <div class="game-filters" id="gameFilters" role="tablist"><!-- injected --></div>
+      </div>
+
+      <div class="games-grid" id="gamesGrid"><!-- game cards injected by hub.js --></div>
+
+    </section>
+
+    <!-- Side widgets column -->
+    <aside class="widgets-column">
+
+      <!-- Daily Missions -->
+      <section class="widget" id="widgetTasks">
+        <div class="widget-header">
+          <h2>🎯 Daily Missions</h2>
+          <span class="widget-tag" id="tasksResetTag">resets in —</span>
+        </div>
+        <ul class="task-list" id="taskList"><!-- injected --></ul>
+      </section>
+
+      <!-- Achievements -->
+      <section class="widget" id="widgetAchievements">
+        <div class="widget-header">
+          <h2>🏆 Achievements</h2>
+          <span class="widget-tag" id="achievementsCount">0 / 0</span>
+        </div>
+        <div class="achievements-grid" id="achievementsGrid"><!-- injected --></div>
+      </section>
+
+    </aside>
+
+  </main>
+
+  <script type="module" src="js/hub.js"></script>
+</body>
+</html>
